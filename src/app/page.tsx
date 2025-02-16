@@ -42,7 +42,7 @@ export default function Home() {
   <span className="text-red-500">سراج سوفت</span>
 </p>
           
-           <DivOrigami className="mb-5" />
+           <DivOrigami  />
         </motion.h1>
         <motion.p
           initial={{ opacity: 0 }}
