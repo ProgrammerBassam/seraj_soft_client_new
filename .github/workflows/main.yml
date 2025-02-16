@@ -1,0 +1,49 @@
+name: Build and Release Tauri App
+
+on:
+  push:
+    tags:
+      - "v*" # يتم تشغيل الـ Workflow عند إنشاء Tag تبدأ بـ v
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛎️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: 🦀 Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: 🚀 Install Tauri CLI
+        run: npm install --global @tauri-apps/cli
+
+      - name: 📦 Install dependencies
+        run: npm install
+
+      - name: 🔨 Build Tauri App
+        run: npx tauri build
+
+      - name: 📤 Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tauri-build
+          path: src-tauri/target/release/bundle/
+
+      - name: 🚀 Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: src-tauri/target/release/bundle/**/*
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          body: "🚀 New release ${{ github.ref_name }} is available!"
+          draft: false
+          prerelease: false
