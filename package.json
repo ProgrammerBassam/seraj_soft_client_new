@@ -11,6 +11,9 @@
     "tauri:build": "tauri build"
   },
   "dependencies": {
+    "@tauri-apps/plugin-process": "^2.2.0",
+    "@tauri-apps/plugin-updater": "^2.5.1",
+    "firebase-admin": "^13.1.0",
     "framer-motion": "^12.4.3",
     "next": "15.1.6",
     "qrcode.react": "^4.2.0",
