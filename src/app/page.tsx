@@ -1,27 +1,69 @@
-"use client"; // إضافة هذا السطر في بداية الملف
+// "use client"; // اجعل الملف Client Component
 
-import React, { useEffect } from 'react';
-import { check } from '@tauri-apps/plugin-updater';
-import { relaunch } from '@tauri-apps/plugin-process';
+// import { useEffect } from "react";
+// import { check } from "@tauri-apps/plugin-updater";
+// import { relaunch } from "@tauri-apps/plugin-process";
 
+// const App = () => {
+//   useEffect(() => {
+//     const updateApp = async () => {
+//       try {
+//         const update = await check();
+//         if (update?.available) {
+//           await update.downloadAndInstall();
+//           await relaunch();
+//         }
+//       } catch (error) {
+//         console.error("Error checking for updates:", error);
+//       }
+//     };
+
+//     if (typeof window !== "undefined") {
+//       updateApp();
+//     }
+//   }, []);
+
+//   return <div>My Tauri App</div>;
+// };
+
+// export default App;
+
+
+"use client"; // اجعل الملف Client Component
+
+import { useEffect } from "react";
+import { check } from "@tauri-apps/plugin-updater";
+import { relaunch } from "@tauri-apps/plugin-process";
 
 const App = () => {
- 
   useEffect(() => {
-    async function checkForUpdates() {
-      const update = await check();
-      if (update) {
-        console.log(`تم العثور على تحديث: ${update.version}`);
-        await update.downloadAndInstall();
-        await relaunch();  // إعادة تشغيل التطبيق بعد التثبيت
+    const updateApp = async () => {
+      try {
+        console.log("🔍 Checking for updates...");
+
+        const update = await check();
+
+        if (update?.available) {
+          console.log(`🚀 Update available! Version: ${update.version}`);
+          console.log("⬇️ Downloading update...");
+          await update.downloadAndInstall();
+          console.log("✅ Update installed successfully. Relaunching app...");
+          await relaunch();
+        } else {
+          console.log("✅ No updates available. You are on the latest version.");
+        }
+      } catch (error) {
+        console.error("❌ Error checking for updates:", error);
       }
+    };
+
+    if (typeof window !== "undefined") {
+      updateApp();
     }
-    
-    // استدعاء الدالة لفحص التحديثات
-    checkForUpdates();
   }, []);
 
-  return <div>مرحبًا بك في التطبيق!</div>;
+  return <div>My Tauri App</div>;
 };
 
 export default App;
+
