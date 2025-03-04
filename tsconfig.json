@@ -22,15 +22,14 @@
         "name": "next"
       }
     ],
+  "baseUrl": "src",
     "paths": {
-      "@/*": [
-        "./src/*"
-        
-      ],
-      "@lib/*": ["./lib/*"]         
-    }
+  "@/*": ["*"],
+  "@lib/*": ["../lib/*"]
+}
   },
   "include": [
+    "src",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
