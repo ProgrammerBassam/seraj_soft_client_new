@@ -33,7 +33,7 @@ const App = () => {
     }
   }, []);
 
-  return <div>My Tauri App  v2</div>;
+  return <div>My Tauri App  v3  test</div>;
 };
 
 export default App;
