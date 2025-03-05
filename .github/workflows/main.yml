@@ -9,7 +9,7 @@ jobs:
   build:
     permissions:
       contents: write
-    runs-on: ubuntu-latest
+    runs-on: windows-latest # تشغيل الـ Workflow على نظام Windows
 
     steps:
       - name: 🛎️ Checkout repository
@@ -23,26 +23,19 @@ jobs:
       - name: 🦀 Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: 🏗 Install system dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y \
-            libglib2.0-dev pkg-config libgtk-3-dev \
-            libwebkit2gtk-4.1-dev  # تثبيت WebKit2 و JavaScriptCore
+      - name: 📦 Install dependencies
+        run: npm install
 
       - name: 🚀 Install Tauri CLI
         run: npm install --global @tauri-apps/cli
 
-      - name: 📦 Install dependencies
-        run: npm install
+      - name: 🔨 Build Tauri App (Windows)
+        run: npx tauri build --target windows-msi # بناء التطبيق مع هدف Windows MSI
 
-      - name: 🔨 Build Tauri App
-        run: npx tauri build
-
-      - name: 📤 Upload artifacts
+      - name: 📤 Upload artifacts (Windows)
         uses: actions/upload-artifact@v4
         with:
-          name: tauri-build
+          name: tauri-build-windows
           path: src-tauri/target/release/bundle/
 
       - name: 🚀 Create GitHub Release
