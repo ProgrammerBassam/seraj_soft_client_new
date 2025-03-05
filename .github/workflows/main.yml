@@ -3,13 +3,11 @@ name: Build and Release Tauri App
 on:
   push:
     tags:
-      - "v*"  # يتم تشغيل الـ Workflow عند إنشاء Tag تبدأ بـ v
+      - "v*"
 
 jobs:
   build:
-    permissions:
-      contents: write
-    runs-on: windows-latest  # تشغيل الـ Workflow على نظام Windows
+    runs-on: windows-latest
 
     steps:
       - name: 🛎️ Checkout repository
@@ -23,14 +21,17 @@ jobs:
       - name: 🦀 Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: 📦 Install required Rust targets
+        run: rustup target add x86_64-pc-windows-msvc
+
       - name: 📦 Install dependencies
         run: npm install
 
       - name: 🚀 Install Tauri CLI
         run: npm install --global @tauri-apps/cli
 
-      - name: 🔨 Build Tauri App (Windows)
-        run: npx tauri build --target msi  # بناء التطبيق مع هدف Windows MSI
+      - name: 🔨 Build Tauri App (Windows MSI)
+        run: npx tauri build --target x86_64-pc-windows-msvc --bundles msi  # استخدم الهدف الصحيح لبناء التطبيق مع حزمة MSI
 
       - name: 📤 Upload artifacts (Windows)
         uses: actions/upload-artifact@v4
