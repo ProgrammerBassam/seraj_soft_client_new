@@ -13,7 +13,7 @@
 //         .expect("error while running tauri application");
 // }
 
-use tauri::Manager;
+// use tauri::Manager;
 use tauri_plugin_updater::Builder as UpdaterBuilder;
 
 fn main() {
