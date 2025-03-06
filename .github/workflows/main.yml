@@ -30,14 +30,13 @@ jobs:
       - name: 🚀 Install Tauri CLI
         run: npm install --global @tauri-apps/cli
 
-      - name: 🔐 Set up Signing Key
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      - name: 🔐 Check if Signing Key Exists
+        shell: pwsh
         run: |
-          if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then
-            echo "❌ Signing key is missing! Make sure to set TAURI_SIGNING_PRIVATE_KEY in GitHub Secrets."
-            exit 1
-          fi
+          if (-not $env:TAURI_SIGNING_PRIVATE_KEY) {
+              Write-Host "❌ Signing key is missing! Make sure to set TAURI_SIGNING_PRIVATE_KEY in GitHub Secrets."
+              exit 1
+          }
 
       - name: 🔨 Build Tauri App (Windows MSI)
         env:
