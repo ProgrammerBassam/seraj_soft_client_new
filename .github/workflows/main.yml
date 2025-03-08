@@ -41,18 +41,16 @@ jobs:
               exit 1
           }
 
-      - name: 🔐 Check if Signing Key Exists
-        shell: pwsh
-        run: |
-          if (-not $env:TAURI_SIGNING_PRIVATE_KEY) {
-              Write-Host "❌ Signing key is missing! Make sure to set TAURI_SIGNING_PRIVATE_KEY in GitHub Secrets."
-              exit 1
-          }
-
       - name: 🔨 Build Tauri App (Windows MSI)
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         run: npx tauri build --target x86_64-pc-windows-msvc --bundles msi
+
+      - name: 🔍 Debug Signing Key
+        run: |
+          echo "$TAURI_SIGNING_PRIVATE_KEY"
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
 
       - name: 📤 Upload artifacts (Windows)
         uses: actions/upload-artifact@v4
