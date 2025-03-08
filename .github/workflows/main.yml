@@ -41,14 +41,6 @@ jobs:
               exit 1
           }
 
-      - name: 🔐 Check if Signing Key Exists
-        shell: pwsh
-        run: |
-          if (-not $env:TAURI_SIGNING_PRIVATE_KEY) {
-              Write-Host "❌ Signing key is missing! Make sure to set TAURI_SIGNING_PRIVATE_KEY in GitHub Secrets."
-              exit 1
-          }
-
       - name: 🔨 Build Tauri App (Windows MSI)
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
@@ -58,13 +50,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tauri-build-windows
-          path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
-          path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+          path: src-tauri/target/release/bundle/msi/*.msi
 
       - name: 🚀 Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+          files: src-tauri/target/release/bundle/msi/*.msi
           tag_name: ${{ github.ref_name }}
           release_name: Release ${{ github.ref_name }}
           body: "🚀 New release ${{ github.ref_name }} is available!"
