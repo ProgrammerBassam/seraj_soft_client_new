@@ -31,21 +31,18 @@ jobs:
         run: npm install --global @tauri-apps/cli
 
       - name: 🛠 Debug Environment Variables
-        run: env | sort
-
-      - name: 🔐 Check if Signing Key and Password Exists
-        shell: pwsh
         run: |
-          if ([string]::IsNullOrWhiteSpace($env:TAURI_SIGNING_PRIVATE_KEY) -or [string]::IsNullOrWhiteSpace($env:TAURI_SIGNING_PASSWORD)) {
-              Write-Host "❌ Signing key or password is missing! Make sure to set TAURI_SIGNING_PRIVATE_KEY and TAURI_SIGNING_PASSWORD in GitHub Secrets."
-              exit 1
-          }
+          echo "Printing environment variables for debugging..."
+          env | sort
+
 
       - name: 🔨 Build Tauri App (Windows MSI)
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PASSWORD: ${{ secrets.TAURI_SIGNING_PASSWORD }}
-        run: npx tauri build --target x86_64-pc-windows-msvc --bundles msi
+        run: |
+          echo "Building the Tauri app for Windows MSI..."
+          npx tauri build --target x86_64-pc-windows-msvc --bundles msi
 
       - name: 📤 Upload artifacts (Windows)
         uses: actions/upload-artifact@v4
