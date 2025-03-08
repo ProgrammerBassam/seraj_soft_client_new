@@ -39,7 +39,6 @@ jobs:
       - name: 🔨 Build Tauri App (Windows MSI)
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PASSWORD: "${{ secrets.TAURI_SIGNING_PASSWORD }}"
         run: |
           echo "Building the Tauri app for Windows MSI..."
           npx tauri build --target x86_64-pc-windows-msvc --bundles msi
