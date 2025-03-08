@@ -33,13 +33,7 @@ jobs:
       - name: 🛠 Debug Environment Variables
         run: env | sort
 
-      - name: 🔐 Check if Signing Key Exists
-        shell: pwsh
-        run: |
-          if ([string]::IsNullOrWhiteSpace($env:TAURI_SIGNING_PRIVATE_KEY)) {
-              Write-Host "❌ Signing key is missing! Make sure to set TAURI_SIGNING_PRIVATE_KEY in GitHub Secrets."
-              exit 1
-          }
+    
 
       - name: 🔨 Build Tauri App (Windows MSI)
         env:
