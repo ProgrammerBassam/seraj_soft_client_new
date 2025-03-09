@@ -9,8 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "tauri": "tauri dev",
-    "tauri:build": "node --no-warnings scripts/update-latest-json.js && tauri build"
-  },
+    "tauri:build": "node --no-warnings scripts/update-latest-json.mjs && tauri build"  },
   "dependencies": {
     "@tauri-apps/api": "^2.3.0",
     "@tauri-apps/plugin-dialog": "^2.2.0",

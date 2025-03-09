@@ -35,7 +35,7 @@
     ".next/types/**/*.ts",
     "next-env.d.ts",
     "out/types/**/*.ts"
-, "scripts/update-latest-json.js"  ],
+, "scripts/update-latest-json.mjs"  ],
   "exclude": [
     "node_modules"
   ]
