@@ -1,8 +1,15 @@
 import { writeFileSync } from "fs";
-import { join } from "path";
-import packageJson from "../package.json";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 
-const version: string = packageJson.version;
+// استخدام fileURLToPath للحصول على __dirname في بيئة ES Modules
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// إضافة سمة assert لـ package.json
+import packageJson from "../package.json" assert { type: "json" };
+
+const version = packageJson.version;
+
 const latestJson = {
   version,
   notes: `🚀 إصدار جديد متاح: ${version}`,

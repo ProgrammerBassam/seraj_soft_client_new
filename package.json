@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "tauri": "tauri dev",
-  "tauri:build": "ts-node scripts/update-latest-json.ts && tauri build"
+    "tauri:build": "node --no-warnings scripts/update-latest-json.js && tauri build"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.3.0",
