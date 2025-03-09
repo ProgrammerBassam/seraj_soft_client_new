@@ -24,3 +24,4 @@ const latestJson = {
 
 writeFileSync(join(__dirname, "../src-tauri/target/latest.json"), JSON.stringify(latestJson, null, 2));
 console.log("✅ تم إنشاء latest.json بنجاح!");
+console.log("✅ تم إنشاء latest.json بنجاح!");
