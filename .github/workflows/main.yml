@@ -5,6 +5,9 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write  # ✅ يمنح صلاحية التعديل على الإصدارات
+
 jobs:
   build:
     runs-on: windows-latest
@@ -35,7 +38,6 @@ jobs:
           echo "Printing environment variables for debugging..."
           env | sort
 
-
       - name: 🔨 Build Tauri App (Windows MSI)
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
@@ -54,7 +56,9 @@ jobs:
         with:
           files: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
           tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
+          name: "Release ${{ github.ref_name }}"  # ✅ استبدل release_name بـ name
           body: "🚀 New release ${{ github.ref_name }} is available!"
           draft: false
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # ✅ تأكد من استخدام GITHUB_TOKEN الافتراضي
