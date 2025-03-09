@@ -100,7 +100,7 @@ const App = () => {
     }
   }, []);
 
-  return <div>My Tauri App v4 test 4 </div>;
+  return <div>My Tauri App v5 test 5 777 </div>;
 };
 
 export default App;
