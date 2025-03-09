@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "next build && npm run tauri:build",
     "start": "next start",
     "lint": "next lint",
     "tauri": "tauri dev",
-    "tauri:build": "tauri build"
+  "tauri:build": "ts-node scripts/update-latest-json.ts && tauri build"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.3.0",
@@ -27,13 +27,14 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tauri-apps/cli": "^2.3.1",
-    "@types/node": "^20",
+    "@types/node": "^20.17.24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

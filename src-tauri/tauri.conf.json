@@ -50,7 +50,8 @@
     "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEY5OEQxMTY2MDUyRjExOTYKUldTV0VTOEZaaEdOK2EvOHlBM3d1VFR5T2tiWWFEUFdZYkhFaHVJZDBYMWlxLzMzVDVMeTdVcUsK",
     "endpoints": [
       "https://github.com/ProgrammerBassam/seraj_soft_client_new/releases/download/v0.5.0/latest.json"
-    ]
+    ],
+    "dialog": true
   },
   "process": {},
   "allowlist": {

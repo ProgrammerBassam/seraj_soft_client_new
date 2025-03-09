@@ -1,44 +1,19 @@
 
 
 // "use client";
+// import { checkUpdate, installUpdate } from '@tauri-apps/api/updater';
 
-// import { useEffect } from "react";
-// import { check } from "@tauri-apps/plugin-updater";
-// import { relaunch } from "@tauri-apps/plugin-process";
+// async function updateApp() {
+//   const { shouldUpdate } = await checkUpdate();
+//   if (shouldUpdate) {
+//     await installUpdate();
+//   } else {
+//     alert("التطبيق محدث بالفعل!");
+//   }
+// }
 
-// const App = () => {
-//   useEffect(() => {
-//     const updateApp = async () => {
-//       try {
-//         console.log("🔍 Checking for updates...");
+// <button onClick={updateApp}>🔄 تحقق من التحديثات</button>;
 
-//         const update = await check();
-
-//         if (update?.available) {
-//           console.log(`🚀 Update available! Version: ${update.version}`);
-//           console.log("⬇️ Downloading update...");
-//           await update.downloadAndInstall();
-//           console.log("✅ Update installed successfully. Relaunching app...");
-//           await relaunch();
-//         } else {
-//           console.log("✅ No updates available. You are on the latest version.");
-//         }
-//       } catch (error) {
-//         console.error("❌ Error checking for updates:", error);
-//       }
-//     };
-
-//     if (typeof window !== "undefined") {
-//       updateApp();
-//     }
-//   }, []);
-
-//   return <div>My Tauri App  v4  test 4</div>;
-// };
-
-// export default App;
-
-// src/pages/index.tsx (or wherever you need logging)
 
 
 "use client";

@@ -54,7 +54,10 @@ jobs:
       - name: 🚀 Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+          files: |
+            src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+            src-tauri/target/latest.json
+          
           tag_name: ${{ github.ref_name }}
           name: "Release ${{ github.ref_name }}"  # ✅ استبدل release_name بـ name
           body: "🚀 New release ${{ github.ref_name }} is available!"
