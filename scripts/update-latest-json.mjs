@@ -1,4 +1,4 @@
-import { writeFileSync } from "fs";
+import { writeFileSync, existsSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -9,6 +9,14 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 import packageJson from "../package.json" assert { type: "json" };
 
 const version = packageJson.version;
+
+// المسار إلى المجلد target
+const targetDir = join(__dirname, "../src-tauri/target");
+
+// تحقق من وجود المجلد، وإذا لم يكن موجودًا، أنشئه
+if (!existsSync(targetDir)) {
+  mkdirSync(targetDir, { recursive: true });
+}
 
 const latestJson = {
   version,
@@ -22,6 +30,6 @@ const latestJson = {
   }
 };
 
-writeFileSync(join(__dirname, "../src-tauri/target/latest.json"), JSON.stringify(latestJson, null, 2));
-console.log("✅ تم إنشاء latest.json بنجاح!");
+// كتابة البيانات إلى ملف latest.json
+writeFileSync(join(targetDir, "latest.json"), JSON.stringify(latestJson, null, 2));
 console.log("✅ تم إنشاء latest.json بنجاح!");
