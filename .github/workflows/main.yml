@@ -41,11 +41,7 @@ jobs:
       - name: 📝 Generate latest.json
         run: node scripts/update-latest-json.mjs  # ✅ لتوليد latest.json
 
-      - name: 🔑 Sign latest.json
-        run: npx tauri signer sign --private-key-path "$TAURI_SIGNING_PRIVATE_KEY" -f "src-tauri/target/latest.json"
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-      
+   
 
 
           
