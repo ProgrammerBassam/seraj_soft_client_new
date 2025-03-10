@@ -1,20 +1,21 @@
 {
   "name": "نظام سراج سوفت",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
-  "type": "module",  
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "tauri": "tauri dev",
-    "tauri:build": "node --no-warnings scripts/update-latest-json.mjs && npm run build " },
+    "tauri:build": "node --no-warnings scripts/update-latest-json.mjs && npm run build "
+  },
   "dependencies": {
     "@tauri-apps/api": "^2.3.0",
     "@tauri-apps/plugin-dialog": "^2.2.0",
     "@tauri-apps/plugin-process": "^2.2.0",
-    "@tauri-apps/plugin-updater": "^2.5.1",
+    "@tauri-apps/plugin-updater": "^2.6.0",
     "firebase-admin": "^13.1.0",
     "framer-motion": "^12.4.3",
     "next": "^15.1.6",

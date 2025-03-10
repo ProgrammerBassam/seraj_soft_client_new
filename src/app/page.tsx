@@ -1,18 +1,41 @@
 
 
 // "use client";
-// import { checkUpdate, installUpdate } from '@tauri-apps/api/updater';
+// import { useEffect } from "react";
+// import { checkUpdate, installUpdate } from "@tauri-apps/api/updater";
+// import { relaunch } from "@tauri-apps/api/process";
+
 
 // async function updateApp() {
-//   const { shouldUpdate } = await checkUpdate();
-//   if (shouldUpdate) {
-//     await installUpdate();
-//   } else {
-//     alert("التطبيق محدث بالفعل!");
+//   try {
+//     const { shouldUpdate, manifest } = await checkUpdate();
+
+//     if (shouldUpdate) {
+//       console.log(`يوجد تحديث جديد: ${manifest.version}`);
+//       await installUpdate();
+//       await relaunch();
+//     }
+//   } catch (error) {
+    
+//     console.error("فشل التحقق من التحديث:", error);
 //   }
 // }
 
-// <button onClick={updateApp}>🔄 تحقق من التحديثات</button>;
+// function App() {
+//   useEffect(() => {
+//     updateApp();
+//   }, []);
+
+//   return (
+//     <div>
+//       <h1>مرحبًا بك في تطبيقي</h1>
+//       <p>سيتم التحقق من التحديثات تلقائيًا عند بدء التشغيل.</p>
+//     </div>
+//   );
+// }
+
+// export default App;
+
 
 
 
@@ -75,10 +98,43 @@ const App = () => {
     }
   }, []);
 
-  return <div>My Tauri App v6 6</div>;
+  return <div>My Tauri App v 7</div>;
 };
 
 export default App;
 
 
 
+
+
+
+
+
+
+// [package]
+// name = "app"
+// version = "0.6.0"
+// description = "A Tauri App"
+// authors = ["you"]
+// license = ""
+// repository = ""
+// edition = "2021"
+// rust-version = "1.77.2"
+
+
+// [lib]
+// name = "app_lib"
+// crate-type = ["staticlib", "cdylib", "rlib"]
+
+// [build-dependencies]
+// tauri-build = { version = "2.0.4", features = [] }
+
+// [dependencies]
+// serde_json = "1.0"
+// serde = { version = "1.0", features = ["derive"] }
+// log = "0.4"
+// tauri = { version = "2.2.4", features = [] }
+// tauri-plugin-log = "2.0.0-rc"
+ 
+// tauri-plugin-updater = { version = "2.0.0-beta", features = ["rustls-tls"] }
+// tauri-plugin-dialog = "2.0.0-beta"

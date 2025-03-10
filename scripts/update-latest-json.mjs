@@ -33,3 +33,33 @@ const latestJson = {
 // كتابة البيانات إلى ملف latest.json
 writeFileSync(join(targetDir, "latest.json"), JSON.stringify(latestJson, null, 2));
 console.log("✅ تم إنشاء latest.json بنجاح!");
+
+
+// import { writeFileSync, existsSync, mkdirSync } from "fs";
+// import { execSync } from "child_process";  // ✅ استيراد execSync من child_process
+// import { join, dirname } from "path";
+// import { fileURLToPath } from "url";
+// import packageJson from "../package.json" assert { type: "json" };
+
+// const __dirname = dirname(fileURLToPath(import.meta.url));
+// const version = "0.7.0";  // ✅ تأكد من تحديد الإصدار الصحيح
+
+// const targetDir = join(__dirname, "../src-tauri/target");
+// if (!existsSync(targetDir)) {
+//   mkdirSync(targetDir, { recursive: true });
+// }
+
+// const latestJson = {
+//   version,
+//   notes: `🚀 إصدار جديد متاح: ${version}`,
+//   pub_date: new Date().toISOString(),
+//   platforms: {
+//     "windows-x86_64": {
+//       signature: "",
+//       url: `https://github.com/ProgrammerBassam/seraj_soft_client_new/releases/download/v${version}/app-installer.msi`
+//     }
+//   }
+// };
+
+// writeFileSync(join(targetDir, "latest.json"), JSON.stringify(latestJson, null, 2));
+// console.log("✅ تم إنشاء latest.json بنجاح!");

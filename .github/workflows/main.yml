@@ -38,6 +38,12 @@ jobs:
           echo "Printing environment variables for debugging..."
           env | sort
 
+      - name: 📝 Generate latest.json
+        run: node scripts/update-latest-json.mjs  # ✅ لتوليد latest.json
+
+      - name: 🔑 Sign latest.json
+        run: npx tauri signer sign -k ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }} -f "src-tauri/target/latest.json"  # ✅ لتوقيع latest.json
+
       - name: 🔨 Build Tauri App (Windows MSI)
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
@@ -56,12 +62,11 @@ jobs:
         with:
           files: |
             src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
-            src-tauri/target/latest.json
-          
+            src-tauri/target/latest.json  # ✅ تأكد من رفع latest.json هنا أيضاً
           tag_name: ${{ github.ref_name }}
-          name: "Release ${{ github.ref_name }}"  # ✅ استبدل release_name بـ name
+          name: "Release ${{ github.ref_name }}"
           body: "🚀 New release ${{ github.ref_name }} is available!"
           draft: false
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # ✅ تأكد من استخدام GITHUB_TOKEN الافتراضي
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
