@@ -39,12 +39,17 @@ jobs:
           env | sort
 
       - name: 📝 Generate latest.json
-        run: node scripts/update-latest-json.mjs  # ✅ لتوليد latest.json
+        run: |
+          echo "Generating latest.json..."
+          node scripts/update-latest-json.mjs  # ✅ توليد latest.json
+          cat src-tauri/target/latest.json  # ✅ عرض محتوى latest.json للتأكد
 
       - name: 🔑 Sign latest.json
-        run: npx tauri signer sign --private-key "dW50cnVzdGVkIGNvbW1lbnQ6IHJzaWduIGVuY3J5cHRlZCBzZWNyZXQga2V5ClJXUlRZMEl5WUFjRC9YNnhCQnJPeDVhem5ZRHJ5NnI5TzcwUW1ySlZKOS9jOVc4a1c0OEFBQkFBQUFBQUFBQUFBQUlBQUFBQWZkZlBTWXVpL0pzR0xRTThYVHZDR2NvM3pIUVRSMmcvemxvNjI5SHdxSWpQNVRrRDhjVy95aTcvZnIrZ3JqUzdOT2JTeTgrMk5pNFBsdG1HcTNQNmI0ZjFPUlNsckhqRGtuTHJ5ZDBQb0tlNW1uRUttSEptNUpNaStuSnprSDlYWWJXRXlvQ3g0U3c9Cg==" --password "" "src-tauri/target/latest.json"
-
-             
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        run: |
+          echo "Signing latest.json..."
+          npx tauri signer sign --private-key "$TAURI_SIGNING_PRIVATE_KEY" --password "" "src-tauri/target/latest.json"
 
       - name: 🔨 Build Tauri App (Windows MSI)
         env:
