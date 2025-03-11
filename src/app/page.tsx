@@ -52,7 +52,7 @@ export default function Page() {
   return (
     <div>
       <h1>Update Checker</h1>
-      <button onClick={handleUpdateCheck}>Check for Updates</button>
+      <button onClick={handleUpdateCheck}>Check for Updates 2</button>
       <p>{updateStatus}</p>
     </div>
   );

@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "seraj-clients",
-  "version": "0.7.0",
+  "version": "0.8.0",
 "identifier": "com.seraj.clients",
   "build": {
     "frontendDist": "../out",
@@ -49,7 +49,7 @@
     },
     "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEY5OEQxMTY2MDUyRjExOTYKUldTV0VTOEZaaEdOK2EvOHlBM3d1VFR5T2tiWWFEUFdZYkhFaHVJZDBYMWlxLzMzVDVMeTdVcUsK",
     "endpoints": [
-      "https://github.com/ProgrammerBassam/seraj_soft_client_new/releases/download/v0.7.0/latest.json"
+      "https://github.com/ProgrammerBassam/seraj_soft_client_new/releases/download/v0.8.0/latest.json"
     ],
     "dialog": true
   },
