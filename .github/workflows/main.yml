@@ -42,8 +42,8 @@ jobs:
         run: |
           echo "Generating latest.json..."
           node scripts/update-latest-json.mjs  # ✅ توليد latest.json
-          ls -la src-tauri/target  # ✅ عرض محتوى المجلد للتأكد
-          cat src-tauri/target/latest.json  # ✅ عرض محتوى latest.json للتأكد
+          dir src-tauri\target  # ✅ عرض محتوى المجلد للتأكد (Windows)
+          type src-tauri\target\latest.json  # ✅ عرض محتوى latest.json للتأكد (Windows)
 
       - name: 🔑 Sign latest.json
         env:
@@ -52,14 +52,14 @@ jobs:
           echo "Signing latest.json..."
           echo "Private key: $TAURI_SIGNING_PRIVATE_KEY"  # ✅ طباعة المفتاح للتأكد من وجوده
           echo "Checking if latest.json exists..."
-          ls -la src-tauri/target  # ✅ عرض محتوى المجلد للتأكد
-          if [ -f "src-tauri/target/latest.json" ]; then
+          dir src-tauri\target  # ✅ عرض محتوى المجلد للتأكد (Windows)
+          if exist src-tauri\target\latest.json (
             echo "latest.json found. Proceeding with signing..."
             npx tauri signer sign --private-key "$TAURI_SIGNING_PRIVATE_KEY" --password "" "src-tauri/target/latest.json"
-          else
+          ) else (
             echo "Error: latest.json not found!"
             exit 1
-          fi
+          )
 
       - name: 🔨 Build Tauri App (Windows MSI)
         env:
