@@ -53,13 +53,13 @@ jobs:
           echo "Private key: $TAURI_SIGNING_PRIVATE_KEY"  # ✅ طباعة المفتاح للتأكد من وجوده
           echo "Checking if latest.json exists..."
           dir src-tauri\target  # ✅ عرض محتوى المجلد للتأكد (Windows)
-          if exist src-tauri\target\latest.json (
+          if (Test-Path "src-tauri\target\latest.json") {
             echo "latest.json found. Proceeding with signing..."
             npx tauri signer sign --private-key "$TAURI_SIGNING_PRIVATE_KEY" --password "" "src-tauri/target/latest.json"
-          ) else (
+          } else {
             echo "Error: latest.json not found!"
             exit 1
-          )
+          }
 
       - name: 🔨 Build Tauri App (Windows MSI)
         env:
