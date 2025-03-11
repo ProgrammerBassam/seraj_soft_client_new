@@ -42,7 +42,7 @@ jobs:
         run: node scripts/update-latest-json.mjs  # ✅ لتوليد latest.json
 
       - name: 🔑 Sign latest.json
-        run: npx tauri signer sign --private-key "dW50cnVzdGVkIGNvbW1lbnQ6IHJzaWduIGVuY3J5cHRlZCBzZWNyZXQga2V5ClJXUlRZMEl5WUFjRC9YNnhCQnJPeDVhem5ZRHJ5NnI5TzcwUW1ySlZKOS9jOVc4a1c0OEFBQkFBQUFBQUFBQUFBQUlBQUFBQWZkZlBTWXVpL0pzR0xRTThYVHZDR2NvM3pIUVRSMmcvemxvNjI5SHdxSWpQNVRrRDhjVy95aTcvZnIrZ3JqUzdOT2JTeTgrMk5pNFBsdG1HcTNQNmI0ZjFPUlNsckhqRGtuTHJ5ZDBQb0tlNW1uRUttSEptNUpNaStuSnprSDlYWWJXRXlvQ3g0U3c9Cg==" "src-tauri/target/latest.json" --no-password
+        run: npx tauri signer sign --private-key "dW50cnVzdGVkIGNvbW1lbnQ6IHJzaWduIGVuY3J5cHRlZCBzZWNyZXQga2V5ClJXUlRZMEl5WUFjRC9YNnhCQnJPeDVhem5ZRHJ5NnI5TzcwUW1ySlZKOS9jOVc4a1c0OEFBQkFBQUFBQUFBQUFBQUlBQUFBQWZkZlBTWXVpL0pzR0xRTThYVHZDR2NvM3pIUVRSMmcvemxvNjI5SHdxSWpQNVRrRDhjVy95aTcvZnIrZ3JqUzdOT2JTeTgrMk5pNFBsdG1HcTNQNmI0ZjFPUlNsckhqRGtuTHJ5ZDBQb0tlNW1uRUttSEptNUpNaStuSnprSDlYWWJXRXlvQ3g0U3c9Cg=="   --password ""  "src-tauri/target/latest.json" --no-password
              
 
       - name: 🔨 Build Tauri App (Windows MSI)
