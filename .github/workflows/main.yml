@@ -42,8 +42,7 @@ jobs:
         run: node scripts/update-latest-json.mjs  # ✅ لتوليد latest.json
 
       - name: 🔑 Sign latest.json
-        run: npx tauri signer sign --private-key-path "${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}" -f "src-tauri/target/latest.json"
-      
+        run: npx tauri signer sign --private-key-path "${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}" --file "src-tauri/target/latest.json"
 
       - name: 🔨 Build Tauri App (Windows MSI)
         env:
