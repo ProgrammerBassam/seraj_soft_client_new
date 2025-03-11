@@ -45,6 +45,17 @@ jobs:
           dir src-tauri\target  # ✅ عرض محتوى المجلد للتأكد (Windows)
           type src-tauri\target\latest.json  # ✅ عرض محتوى latest.json للتأكد (Windows)
 
+ 
+
+      - name: 🔨 Build Tauri App (Windows MSI)
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        run: |
+          echo "Building the Tauri app for Windows MSI..."
+          echo "Private key: $TAURI_SIGNING_PRIVATE_KEY" 
+          npx tauri build --target x86_64-pc-windows-msvc --bundles msi
+
+
       - name: 🔑 Sign latest.json
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}  # ✅ استخدام المتغير البيئي
@@ -60,14 +71,6 @@ jobs:
             echo "Error: latest.json not found!"
             exit 1
           }
-
-      - name: 🔨 Build Tauri App (Windows MSI)
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        run: |
-          echo "Building the Tauri app for Windows MSI..."
-          npx tauri build --target x86_64-pc-windows-msvc --bundles msi
-
       - name: 📤 Upload artifacts (Windows)
         uses: actions/upload-artifact@v4
         with:
