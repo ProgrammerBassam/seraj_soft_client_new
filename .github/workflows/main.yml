@@ -46,20 +46,24 @@ jobs:
           type src-tauri\target\latest.json  # ✅ عرض محتوى latest.json للتأكد (Windows)
 
       - name: 🔑 Sign latest.json
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}  # ✅ استخدام المتغير البيئي
         run: |
           echo "Signing latest.json..."
-          echo "Private key: dW50cnVzdGVkIGNvbW1lbnQ6IHJzaWduIGVuY3J5cHRlZCBzZWNyZXQga2V5ClJXUlRZMEl5WUFjRC9YNnhCQnJPeDVhem5ZRHJ5NnI5TzcwUW1ySlZKOS9jOVc4a1c0OEFBQkFBQUFBQUFBQUFBQUlBQUFBQWZkZlBTWXVpL0pzR0xRTThYVHZDR2NvM3pIUVRSMmcvemxvNjI5SHdxSWpQNVRrRDhjVy95aTcvZnIrZ3JqUzdOT2JTeTgrMk5pNFBsdG1HcTNQNmI0ZjFPUlNsckhqRGtuTHJ5ZDBQb0tlNW1uRUttSEptNUpNaStuSnprSDlYWWJXRXlvQ3g0U3c9Cg=="  # ✅ طباعة المفتاح للتأكد من وجوده
+          echo "Private key: $TAURI_SIGNING_PRIVATE_KEY"  # ✅ طباعة المفتاح للتأكد من وجوده
           echo "Checking if latest.json exists..."
           dir src-tauri\target  # ✅ عرض محتوى المجلد للتأكد (Windows)
           if (Test-Path "src-tauri\target\latest.json") {
             echo "latest.json found. Proceeding with signing..."
-            npx tauri signer sign --private-key "dW50cnVzdGVkIGNvbW1lbnQ6IHJzaWduIGVuY3J5cHRlZCBzZWNyZXQga2V5ClJXUlRZMEl5WUFjRC9YNnhCQnJPeDVhem5ZRHJ5NnI5TzcwUW1ySlZKOS9jOVc4a1c0OEFBQkFBQUFBQUFBQUFBQUlBQUFBQWZkZlBTWXVpL0pzR0xRTThYVHZDR2NvM3pIUVRSMmcvemxvNjI5SHdxSWpQNVRrRDhjVy95aTcvZnIrZ3JqUzdOT2JTeTgrMk5pNFBsdG1HcTNQNmI0ZjFPUlNsckhqRGtuTHJ5ZDBQb0tlNW1uRUttSEptNUpNaStuSnprSDlYWWJXRXlvQ3g0U3c9Cg==" --password "" "src-tauri/target/latest.json"
+            npx tauri signer sign --private-key "$TAURI_SIGNING_PRIVATE_KEY" --password "" "src-tauri/target/latest.json"
           } else {
             echo "Error: latest.json not found!"
             exit 1
           }
 
       - name: 🔨 Build Tauri App (Windows MSI)
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         run: |
           echo "Building the Tauri app for Windows MSI..."
           npx tauri build --target x86_64-pc-windows-msvc --bundles msi
