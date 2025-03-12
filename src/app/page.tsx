@@ -1,10 +1,9 @@
-"use client";
-
-
+'use client';
 import { check } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { useState, useEffect } from "react";
 
+// التعامل مع Tauri API
 export default function Page() {
   const [updateStatus, setUpdateStatus] = useState<string>("Idle...");
   const [progress, setProgress] = useState<number | null>(null);
@@ -13,22 +12,42 @@ export default function Page() {
   const [releaseNotes, setReleaseNotes] = useState<string | null>(null);
 
   // استخدام Tauri API لجلب الإصدار الحالي عند تحميل الصفحة
-// استخدام Tauri API لجلب الإصدار الحالي عند تحميل الصفحة
-useEffect(() => {
-  window.__TAURI__.app.getVersion()
-    .then(setCurrentVersion)
-    .catch((error: unknown) => { // تحديد نوع الخطأ كـ unknown
-      if (error instanceof Error) {
-        console.error("❌ Failed to get current version:", error.message);
-        setUpdateStatus("Failed to get current version.");
-      } else {
-        console.error("❌ Failed to get current version:", error);
-        setUpdateStatus("An unknown error occurred.");
-      }
-    });
-}, []);
-
-
+  // useEffect(() => {
+  //   if (typeof window !== "undefined" && window.__TAURI__) {
+  //     window.__TAURI__.app.getVersion()
+  //       .then(setCurrentVersion)
+  //       .catch((error: unknown) => {
+  //         if (error instanceof Error) {
+  //           console.error("❌ Failed to get current version:", error.message);
+  //           setUpdateStatus("Failed to get current version.");
+  //         } else {
+  //           console.error("❌ Failed to get current version:", error);
+  //           setUpdateStatus("An unknown error occurred.");
+  //         }
+  //       });
+  //   } else {
+  //     console.log("⚠️ Tauri is not available in this environment.");
+  //   }
+  // }, []);
+  
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.__TAURI__) {
+      window.__TAURI__.app.getVersion()
+        .then(setCurrentVersion)
+        .catch((error: unknown) => {
+          if (error instanceof Error) {
+            console.error("❌ Failed to get current version:", error.message);
+            setUpdateStatus("Failed to get current version.");
+          } else {
+            console.error("❌ Failed to get current version:", error);
+            setUpdateStatus("An unknown error occurred.");
+          }
+        });
+    } else {
+      console.log("⚠️ Tauri is not available in this environment.");
+    }
+  }, []);
+  
   // وظيفة لفحص التحديثات المتاحة
   const handleUpdateCheck = async () => {
     setUpdateStatus("Checking for updates...");
@@ -78,7 +97,7 @@ useEffect(() => {
         console.log("⚠️ No update available.");
         setUpdateStatus("Your app is up to date.");
       }
-    } catch (error: unknown) { // تحديد نوع الخطأ على أنه unknown
+    } catch (error: unknown) {
       if (error instanceof Error) {
         console.error("❌ Error during update check:", error.message);
         setUpdateStatus(`Error: ${error.message}`);

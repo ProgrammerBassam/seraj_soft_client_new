@@ -35,7 +35,10 @@
     ".next/types/**/*.ts",
     "next-env.d.ts",
     "out/types/**/*.ts"
-, "scripts/update-latest-json.mjs"  ],
+, "scripts/update-latest-json.mjs",
+"src/app/window.d.ts"  // إضافة هذا السطر لتضمين ملف window.d.ts
+],
+
   "exclude": [
     "node_modules"
   ]
