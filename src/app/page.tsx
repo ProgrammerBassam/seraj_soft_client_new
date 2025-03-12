@@ -1,9 +1,8 @@
-'use client';
+"use client";
 import { check } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { useState, useEffect } from "react";
 
-// التعامل مع Tauri API
 export default function Page() {
   const [updateStatus, setUpdateStatus] = useState<string>("Idle...");
   const [progress, setProgress] = useState<number | null>(null);
@@ -11,56 +10,44 @@ export default function Page() {
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [releaseNotes, setReleaseNotes] = useState<string | null>(null);
 
-  // استخدام Tauri API لجلب الإصدار الحالي عند تحميل الصفحة
-  // useEffect(() => {
-  //   if (typeof window !== "undefined" && window.__TAURI__) {
-  //     window.__TAURI__.app.getVersion()
-  //       .then(setCurrentVersion)
-  //       .catch((error: unknown) => {
-  //         if (error instanceof Error) {
-  //           console.error("❌ Failed to get current version:", error.message);
-  //           setUpdateStatus("Failed to get current version.");
-  //         } else {
-  //           console.error("❌ Failed to get current version:", error);
-  //           setUpdateStatus("An unknown error occurred.");
-  //         }
-  //       });
-  //   } else {
-  //     console.log("⚠️ Tauri is not available in this environment.");
-  //   }
-  // }, []);
-  
+  // الحصول على الإصدار الحالي عند تحميل الصفحة
   useEffect(() => {
     if (typeof window !== "undefined" && window.__TAURI__) {
+      console.log("Tauri is available!");
       window.__TAURI__.app.getVersion()
-        .then(setCurrentVersion)
-        .catch((error: unknown) => {
-          if (error instanceof Error) {
-            console.error("❌ Failed to get current version:", error.message);
-            setUpdateStatus("Failed to get current version.");
-          } else {
-            console.error("❌ Failed to get current version:", error);
-            setUpdateStatus("An unknown error occurred.");
-          }
+        .then((version) => {
+          console.log("Current version:", version);
+          setCurrentVersion(version);
+        })
+        .catch((error) => {
+          console.error("Failed to get version:", error);
+          setUpdateStatus("فشل في الحصول على الإصدار الحالي.");
         });
     } else {
-      console.log("⚠️ Tauri is not available in this environment.");
+      console.log("Tauri is not available.");
+      setUpdateStatus("Tauri غير متاح.");
     }
   }, []);
-  
-  // وظيفة لفحص التحديثات المتاحة
+
+  // التحقق من التحديثات
   const handleUpdateCheck = async () => {
-    setUpdateStatus("Checking for updates...");
-    console.log("🔍 Checking for updates...");
+    if (typeof window === "undefined" || !window.__TAURI__) {
+      console.log("⚠️ Tauri غير متاح في هذه البيئة.");
+      setUpdateStatus("Tauri غير متاح.");
+      return;
+    }
+
+    setUpdateStatus("جارٍ التحقق من التحديثات...");
+    console.log("🔍 جارٍ التحقق من التحديثات...");
 
     try {
       const update = await check();
 
       if (update && update.version) {
-        console.log(`✅ Update found: v${update.version}`);
+        console.log(`✅ تم العثور على تحديث: v${update.version}`);
         setLatestVersion(update.version);
-        setReleaseNotes(update.body ?? "No release notes available.");
-        setUpdateStatus(`New update v${update.version} found! Downloading...`);
+        setReleaseNotes(update.body ?? "لا توجد ملاحظات إصدار.");
+        setUpdateStatus(`تم العثور على تحديث جديد v${update.version}! جارٍ التنزيل...`);
 
         let downloaded = 0;
         let contentLength = 0;
@@ -69,61 +56,58 @@ export default function Page() {
           switch (event.event) {
             case "Started":
               contentLength = event.data.contentLength ?? 0;
-              console.log(`⬇️ Download started: ${contentLength} bytes`);
+              console.log(`⬇️ بدأ التنزيل: ${contentLength} بايت`);
               setProgress(0);
-              setUpdateStatus("Downloading update...");
+              setUpdateStatus("جارٍ تنزيل التحديث...");
               break;
             case "Progress":
               downloaded += event.data.chunkLength;
               if (contentLength > 0) {
                 const percentage = (downloaded / contentLength) * 100;
                 setProgress(percentage);
-                console.log(`⬇️ Downloading: ${percentage.toFixed(2)}%`);
+                console.log(`⬇️ جارٍ التنزيل: ${percentage.toFixed(2)}%`);
               }
               break;
             case "Finished":
-              console.log("✅ Download finished, installing update...");
-              setUpdateStatus("Installing update...");
+              console.log("✅ اكتمل التنزيل، جارٍ تركيب التحديث...");
+              setUpdateStatus("جارٍ تركيب التحديث...");
               setProgress(null);
               break;
           }
         });
 
-        console.log("🚀 Update installed, relaunching...");
-        setUpdateStatus("Update installed! Relaunching...");
+        console.log("🚀 تم تركيب التحديث، جارٍ إعادة التشغيل...");
+        setUpdateStatus("تم تركيب التحديث! جارٍ إعادة التشغيل...");
         await relaunch();
 
       } else {
-        console.log("⚠️ No update available.");
-        setUpdateStatus("Your app is up to date.");
+        console.log("⚠️ لا توجد تحديثات متاحة.");
+        setUpdateStatus("التطبيق محدث إلى آخر نسخة.");
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
-        console.error("❌ Error during update check:", error.message);
-        setUpdateStatus(`Error: ${error.message}`);
+        console.error("❌ حدث خطأ أثناء التحقق من التحديثات:", error.message);
+        setUpdateStatus(`خطأ: ${error.message}`);
       } else {
-        console.error("❌ Error during update check:", error);
-        setUpdateStatus("An unknown error occurred while checking for updates.");
+        console.error("❌ حدث خطأ أثناء التحقق من التحديثات:", error);
+        setUpdateStatus("حدث خطأ غير معروف أثناء التحقق من التحديثات.");
       }
     }
   };
 
   return (
     <div style={{ padding: "20px" }}>
-      <h1>Update Checker</h1>
-      <p><strong>Current Version:</strong> {currentVersion || "Loading..."}</p>
-      {latestVersion && <p><strong>Latest Version:</strong> {latestVersion}</p>}
-      {releaseNotes && <p><strong>Release Notes:</strong> {releaseNotes}</p>}
+      <h1>مدقق التحديثات</h1>
+      <p><strong>الإصدار الحالي:</strong> {currentVersion || "جارٍ التحميل..."}</p>
+      {latestVersion && <p><strong>الإصدار الأحدث:</strong> {latestVersion}</p>}
+      {releaseNotes && <p><strong>ملاحظات الإصدار:</strong> {releaseNotes}</p>}
 
-      {/* زر لفحص التحديثات */}
       <button onClick={handleUpdateCheck} style={{ padding: "10px 20px", fontSize: "16px", cursor: "pointer" }}>
-        Check for Updates
+        التحقق من التحديثات
       </button>
 
-      {/* عرض حالة التحديث */}
-      <p><strong>Status:</strong> {updateStatus}</p>
+      <p><strong>الحالة:</strong> {updateStatus}</p>
 
-      {/* عرض تقدم تحميل التحديث */}
       {progress !== null && (
         <div style={{ marginTop: "10px" }}>
           <progress value={progress} max="100" style={{ width: "100%" }}></progress>
@@ -131,10 +115,9 @@ export default function Page() {
         </div>
       )}
 
-      {/* في حالة وجود مشكلة، يظهر رسائل الخطأ */}
-      {updateStatus.includes("Error") && (
+      {updateStatus.includes("خطأ") && (
         <p style={{ color: "red", marginTop: "10px" }}>
-          There was an error checking for updates. Please try again later.
+          حدث خطأ أثناء التحقق من التحديثات. يرجى المحاولة مرة أخرى لاحقًا.
         </p>
       )}
     </div>
