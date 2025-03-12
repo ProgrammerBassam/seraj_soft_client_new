@@ -19,14 +19,11 @@ use tauri_plugin_updater::Builder as UpdaterBuilder;
 fn main() {
     tauri::Builder::default()
         .setup(|app| {
-            // التحقق من بيئة سطح المكتب فقط
-            #[cfg(desktop)] 
-            {
-                // تهيئة الـ Updater في بيئة سطح المكتب
-                app.handle().plugin(UpdaterBuilder::new().build())?;
-            }
+            // تهيئة الـ Updater
+            app.handle().plugin(UpdaterBuilder::new().build())?;
             Ok(())
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+
