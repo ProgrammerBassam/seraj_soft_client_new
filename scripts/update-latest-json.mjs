@@ -11,7 +11,7 @@ import packageJson from "../package.json" assert { type: "json" };
 const version = packageJson.version;
 
 // المسار إلى المجلد target
-const targetDir = join(__dirname, "../src-tauri/target");
+const targetDir = join(__dirname, "../src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi");
 
 // تحقق من وجود المجلد، وإذا لم يكن موجودًا، أنشئه
 if (!existsSync(targetDir)) {
@@ -25,7 +25,7 @@ const latestJson = {
   platforms: {
     "windows-x86_64": {
       signature: "",
-      url: `https://github.com/ProgrammerBassam/seraj_soft_client_new/releases/download/v${version}/app-installer.msi`
+      url: `https://github.com/ProgrammerBassam/seraj_soft_client_new/releases/download/v${version}/seraj-clients_${version}_x64_en-US.msi`
     }
   }
 };
