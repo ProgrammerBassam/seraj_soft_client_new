@@ -1,7 +1,9 @@
-"use client";
+'use client';
+
 import { check } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { useState, useEffect } from "react";
+import { app } from '@tauri-apps/api';
 
 export default function Page() {
   const [updateStatus, setUpdateStatus] = useState<string>("Idle...");
@@ -12,25 +14,17 @@ export default function Page() {
 
   // الحصول على الإصدار الحالي عند تحميل الصفحة
   useEffect(() => {
-    if (typeof window !== "undefined" && window.__TAURI__) {
-      console.log("Tauri is available!");
-      window.__TAURI__.app.getVersion()
-        .then((version) => {
-          console.log("Current version:", version);
-          setCurrentVersion(version);
-        })
-        .catch((error) => {
-          console.error("Failed to get version:", error);
-          setUpdateStatus("فشل في الحصول على الإصدار الحالي.");
-        });
-    } else {
-      console.log("Tauri is not available.");
-      setUpdateStatus("Tauri غير متاح.");
-    }
+    const getCurrentVersion = async () => {
+      const version = await app.getVersion();
+      setCurrentVersion(version);
+    };
+    getCurrentVersion();
   }, []);
 
   // التحقق من التحديثات
   const handleUpdateCheck = async () => {
+    console.log("🔍 جارٍ التحقق من التحديثات...");
+
     if (typeof window === "undefined" || !window.__TAURI__) {
       console.log("⚠️ Tauri غير متاح في هذه البيئة.");
       setUpdateStatus("Tauri غير متاح.");
@@ -38,10 +32,10 @@ export default function Page() {
     }
 
     setUpdateStatus("جارٍ التحقق من التحديثات...");
-    console.log("🔍 جارٍ التحقق من التحديثات...");
 
     try {
       const update = await check();
+      console.log("تم التحقق من التحديثات:", update);
 
       if (update && update.version) {
         console.log(`✅ تم العثور على تحديث: v${update.version}`);

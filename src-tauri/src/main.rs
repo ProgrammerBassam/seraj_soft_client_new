@@ -14,6 +14,7 @@
 // }
 
 // use tauri::Manager;
+// src-tauri\src\main.rs
 use tauri_plugin_updater::Builder as UpdaterBuilder;
 
 fn main() {
