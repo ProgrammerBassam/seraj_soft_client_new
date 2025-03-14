@@ -22,20 +22,19 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: 📂 Install Tauri CLI
-        run: pnpm add --global @tauri-apps/cli
+        run: npm add --global @tauri-apps/cli
 
       - name: 📂 Install Project Dependencies
-        run: pnpm install
+        run: npm install
 
       - name: 🛠️ Build Tauri App
-        run: pnpm tauri build
+        run: npm tauri build
 
       - name: 🚀 Upload Release
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: v__VERSION__
           releaseName: "سراج سوفت v__VERSION__"
