@@ -5,14 +5,15 @@
     "windows": [
       "main"
     ],
-    "permissions": [
-      "core:default",
-      "dialog:default",
-      "dialog:allow-ask",
-      "dialog:allow-message",
-      "updater:default",
-      "updater:allow-check",
-      "updater:allow-download-and-install"
-      
-    ]
+"permissions": [
+
+    "dialog:default",
+    "dialog:allow-ask",
+    "dialog:allow-message",
+    "updater:default",
+    "updater:allow-check",
+    "updater:allow-download-and-install",
+    "process:allow-restart"
+  ]
+
   }

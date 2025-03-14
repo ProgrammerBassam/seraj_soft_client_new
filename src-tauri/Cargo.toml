@@ -2,7 +2,7 @@
 
 [package]
 name = "app"
-version = "0.10.0"
+version = "0.11.0"
 description = "A Tauri App"
 authors = ["you"]
 license = ""
@@ -27,7 +27,8 @@ serde = { version = "1.0", features = ["derive"] }
 log = "0.4"
 tauri = { version = "2.2.4", features = [] }
 tauri-plugin-log = "2.0.0"        # استخدم الإصدار المستقر
-tauri-plugin-dialog = "2.0.0"      # استخدم الإصدار المستقر
-tauri-plugin-updater = "2.2.0"  
+tauri-plugin-updater = "2.6.0"
+tauri-plugin-dialog = "2.2.0"
+tauri-plugin-process = "2.2.0"
 
 

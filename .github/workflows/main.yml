@@ -5,9 +5,6 @@ on:
     tags:
       - "v*"
 
-permissions:
-  contents: write  # ✅ يمنح صلاحية التعديل على الإصدارات
-
 jobs:
   build:
     runs-on: windows-latest
@@ -16,79 +13,15 @@ jobs:
       - name: 🛎️ Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🔧 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: 🦀 Setup Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: 📦 Install required Rust targets
-        run: rustup target add x86_64-pc-windows-msvc
-
-      - name: 📦 Install dependencies
-        run: npm install
-
-      - name: 🚀 Install Tauri CLI
-        run: npm install --global @tauri-apps/cli
-
-      - name: 🛠 Debug Environment Variables
-        run: env | sort
-
-      - name: 📝 Generate latest.json
-        run: |
-          echo "Generating latest.json..."
-          node scripts/update-latest-json.mjs  # ✅ توليد latest.json
-          dir src-tauri\target\x86_64-pc-windows-msvc\release\bundle\msi  # ✅ عرض محتوى المجلد للتأكد
-          type src-tauri\target\x86_64-pc-windows-msvc\release\bundle\msi\latest.json
-
-      - name: 🛠 Debug Secrets
-        run: |
-          if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then
-            echo "Error: TAURI_SIGNING_PRIVATE_KEY is empty!"
-            exit 1
-          else
-            echo "TAURI_SIGNING_PRIVATE_KEY is set."
-          fi
-        shell: bash
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-
-      - name: 🔑 Sign latest.json
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        run: |
-          echo "Signing latest.json..."
-          npx tauri signer sign --private-key "$TAURI_SIGNING_PRIVATE_KEY" --password "" "src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/latest.json"
-        shell: bash
-
-      - name: 🔨 Build Tauri App (Windows MSI)
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        run: |
-          echo "Building the Tauri app for Windows MSI..."
-          npx tauri build --target x86_64-pc-windows-msvc --bundles msi
-
-      - name: 📤 Upload artifacts (Windows)
-        uses: actions/upload-artifact@v4
-        with:
-          name: tauri-build-windows
-          path: |
-            src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
-            src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/latest.json  # ✅ تأكد من رفع latest.json مع MSI
-
-
-      - name: 🚀 Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
-            src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/latest.json 
-          tag_name: ${{ github.ref_name }}
-          name: "Release ${{ github.ref_name }}"
-          body: "🚀 New release ${{ github.ref_name }} is available!"
-          draft: false
-          prerelease: false
+      - name: 🚀 Build and Release Tauri App
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        with:
+          tagName: v__VERSION__
+          releaseName: "App v__VERSION__"
+          releaseBody: "🚀 New release v__VERSION__ is available!"
+          includeUpdaterJson: true
+          releaseDraft: false
+          prerelease: false
