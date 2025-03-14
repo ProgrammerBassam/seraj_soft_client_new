@@ -3,40 +3,57 @@ name: Build and Release Tauri App
 on:
   push:
     tags:
-      - 'v*.*.*' # يتم التشغيل عند إصدار tag جديد
+      - "v*"
+
+permissions:
+  contents: write  # ✅ يعطي صلاحيات لتحرير الإصدارات
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-      - name: 🛎️ Checkout Repository
-        uses: actions/checkout@v3
+      - name: 🛎️ Checkout repository
+        uses: actions/checkout@v4
 
       - name: ⚡️ Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: 📦 Install Rust Toolchain
+      - name: 🦀 Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: 📂 Install Tauri CLI
-        run: npm add --global @tauri-apps/cli
+      - name: 📦 Install required Rust targets
+        run: rustup target add x86_64-pc-windows-msvc
 
-      - name: 📂 Install Project Dependencies
+      - name: 📂 Install Dependencies
         run: npm install
 
-      - name: 🛠️ Build Tauri App
-        run: npm tauri build
+      - name: 🚀 Install Tauri CLI
+        run: npm install --global @tauri-apps/cli
 
-      - name: 🚀 Upload Release
-        uses: tauri-apps/tauri-action@v0
+      - name: 🛠️ Build Tauri App (MSI)
+        env:
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        run: npm run tauri build
+
+      - name: 📤 Upload Windows MSI + latest.json
+        uses: actions/upload-artifact@v4
+        with:
+          name: tauri-build-windows
+          path: |
+            src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+            src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/latest.json
+
+      - name: 🚀 Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+            src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/latest.json
+          tag_name: ${{ github.ref_name }}
+          name: "سراج سوفت ${{ github.ref_name }}"
+          body: "🚀 تحديث جديد متاح الآن ✅"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        with:
-          tagName: v__VERSION__
-          releaseName: "سراج سوفت v__VERSION__"
-          releaseBody: "التحديث الجديد متاح الآن 🚀"
-          includeUpdaterJson: true
