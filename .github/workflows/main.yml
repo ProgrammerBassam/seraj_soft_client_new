@@ -60,9 +60,11 @@ jobs:
           echo "${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}" > .tauri/myapp.key  # ✅ حفظ المفتاح في ملف
 
       - name: 🔑 Sign latest.json
+        env:
+            TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         run: |
-          echo "Signing latest.json..."
-          npx tauri signer sign --private-key-path .tauri/myapp.key "src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/latest.json"
+            echo "Signing latest.json..."
+            npx tauri signer sign --private-key "$TAURI_SIGNING_PRIVATE_KEY" --password "" "src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/latest.json"
         shell: bash
 
       - name: 🔨 Build Tauri App (Windows MSI)
