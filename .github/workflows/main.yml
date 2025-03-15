@@ -92,3 +92,72 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+
+
+
+
+
+
+
+# name: Build and Release Tauri App
+
+# on:
+#   push:
+#     tags:
+#       - "v*"
+
+# permissions:
+#   contents: write  # ✅ يعطي صلاحيات لتحرير الإصدارات
+
+# jobs:
+#   build:
+#     runs-on: windows-latest
+
+#     steps:
+#       - name: 🛎️ Checkout repository
+#         uses: actions/checkout@v4
+
+#       - name: ⚡️ Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: '20'
+
+#       - name: 🦀 Install Rust Toolchain
+#         uses: dtolnay/rust-toolchain@stable
+
+#       - name: 📦 Install required Rust targets
+#         run: rustup target add x86_64-pc-windows-msvc
+
+#       - name: 📂 Install Dependencies
+#         run: npm install
+
+#       - name: 🚀 Install Tauri CLI
+#         run: npm install --global @tauri-apps/cli
+
+#       - name: 🛠️ Build Tauri App (MSI)
+#         env:
+#           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+#         run: npm run tauri:build
+
+
+#       - name: 📤 Upload Windows MSI + latest.json
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: tauri-build-windows
+#           path: |
+#             src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+#             src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/latest.json
+
+#       - name: 🚀 Create GitHub Release
+#         uses: softprops/action-gh-release@v2
+#         with:
+#           files: |
+#             src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+#             src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/latest.json
+#           tag_name: ${{ github.ref_name }}
+#           name: "سراج سوفت ${{ github.ref_name }}"
+#           body: "🚀 تحديث جديد متاح الآن ✅"
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

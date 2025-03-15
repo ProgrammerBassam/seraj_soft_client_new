@@ -19,7 +19,7 @@ if (!existsSync(targetDir)) {
 }
 
 const latestJson = {
-  version,
+  version: `${version}`, // هنا تأكدنا أن القيمة نصية
   notes: `🚀 إصدار جديد متاح: ${version}`,
   pub_date: new Date().toISOString(),
   platforms: {
@@ -29,6 +29,7 @@ const latestJson = {
     }
   }
 };
+
 
 // كتابة البيانات إلى ملف latest.json
 writeFileSync(join(targetDir, "latest.json"), JSON.stringify(latestJson, null, 2));
