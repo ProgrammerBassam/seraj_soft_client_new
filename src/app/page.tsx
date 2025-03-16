@@ -91,8 +91,8 @@ export default function Page() {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h1>مدقق التحديثات</h1>
-      <p><strong>الإصدار الحالي:</strong> {currentVersion || "جارٍ التحميل..."}</p>
+      <h1> test مدقق التحديثات</h1>
+      <p><strong>الإصدار الحالي: test</strong> {currentVersion || "جارٍ التحميل..."}</p>
       {latestVersion && <p><strong>الإصدار الأحدث:</strong> {latestVersion}</p>}
       {releaseNotes && <p><strong>ملاحظات الإصدار:</strong> {releaseNotes}</p>}
 
@@ -100,7 +100,7 @@ export default function Page() {
         التحقق من التحديثات
       </button>
 
-      <p><strong>الحالة:</strong> {updateStatus}</p>
+      <p><strong>الحالة: test</strong> {updateStatus}</p>
 
       {progress !== null && (
         <div style={{ marginTop: "10px" }}>
