@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "tauri": "tauri dev",
-    "tauri:build": "node --no-warnings scripts/update-latest-json.mjs && npm run build "
+    "tauri:build": " npm run build "
   },
   "dependencies": {
     "@tauri-apps/api": "^2.3.0",

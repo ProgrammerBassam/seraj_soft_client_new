@@ -12,6 +12,7 @@
 const nextConfig = {
   // distDir: "out", // يضع الملفات النهائية في `out/`
   reactStrictMode: true,
+  output: "export",
   async headers() {
     return [
       {
