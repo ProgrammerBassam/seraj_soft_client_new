@@ -32,14 +32,17 @@
 //         .expect("error while running tauri application");
 // }
 
-use tauri_plugin_updater::UpdaterExt;
+
+use tauri_plugin_updater::UpdaterExt;  // تأكد من إضافة هذا السطر
 
 fn main() {
   tauri::Builder::default()
     .setup(|app| {
       let handle = app.handle().clone();
       tauri::async_runtime::spawn(async move {
-        update(handle).await.unwrap();
+        if let Err(e) = update(handle).await {
+          eprintln!("حدث خطأ أثناء التحقق من التحديثات: {}", e);
+        }
       });
       Ok(())
     })
@@ -66,7 +69,7 @@ async fn update(app: tauri::AppHandle) -> tauri_plugin_updater::Result<()> {
           println!("اكتمل التحديث بنجاح!");
         }
       ).await?;
-      
+
       app.restart();
     },
     Ok(None) => {

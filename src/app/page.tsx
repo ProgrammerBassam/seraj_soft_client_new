@@ -1,119 +1,155 @@
-'use client';
+"use client";
 
-import { check } from "@tauri-apps/plugin-updater";
-import { relaunch } from "@tauri-apps/plugin-process";
-import { useState, useEffect } from "react";
-import { app } from '@tauri-apps/api';
+import { useState, useEffect, useCallback } from "react";
+import { QRCodeCanvas } from "qrcode.react";
+import { motion } from "framer-motion";
+import DivOrigami from "./component/DivOrigami";
+import { useRouter } from "next/navigation";
 
-export default function Page() {
-  const [updateStatus, setUpdateStatus] = useState<string>("Idle...");
-  const [progress, setProgress] = useState<number | null>(null);
-  const [currentVersion, setCurrentVersion] = useState<string | null>(null);
-  const [latestVersion, setLatestVersion] = useState<string | null>(null);
-  const [releaseNotes, setReleaseNotes] = useState<string | null>(null);
+const BASE_URL = "/api/check-client-code"; // ✅ تأكد من صحة الرابط
 
-  // الحصول على الإصدار الحالي عند تحميل الصفحة
-  useEffect(() => {
-    const getCurrentVersion = async () => {
-      const version = await app.getVersion();
-      setCurrentVersion(version);
-    };
-    getCurrentVersion();
+export default function Home() {
+  const [qrCode, setQrCode] = useState<string | null>(null);
+  const [error, setError] = useState<string>("");
+  const [isVerified, setIsVerified] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
+
+  // ✅ وظيفة إنشاء كود جديد
+  const generateQrCode = useCallback(() => {
+    const code = Math.random().toString(36).substring(2, 10);
+    setQrCode(code);
   }, []);
 
-  // التحقق من التحديثات
-  const handleUpdateCheck = async () => {
-    console.log("🔍 جارٍ التحقق من التحديثات...");
+  // ✅ التحقق من الجلسة عند تحميل الصفحة
+  useEffect(() => {
+    const savedQrCode = localStorage.getItem("qr_code");
 
-    if (typeof window === "undefined" || !window.__TAURI__) {
-      console.log("⚠️ Tauri غير متاح في هذه البيئة.");
-      setUpdateStatus("Tauri غير متاح.");
+    if (savedQrCode) {
+      setQrCode(savedQrCode);
+      setTimeout(() => {
+        router.replace("/clients"); // ✅ الانتقال بعد 2 ثانية
+      }, 8000);
+    } else {
+      generateQrCode();
+    }
+
+    // ✅ تحسين الأداء عبر تحميل الصفحة مسبقًا
+    router.prefetch("/clients");
+  }, [router, generateQrCode]);
+
+  const handleNext = async () => {
+    if (!qrCode) {
+      setError("يجب إنشاء كود أولًا!");
       return;
     }
-
-    setUpdateStatus("جارٍ التحقق من التحديثات...");
-
+  
+    setIsLoading(true);
+  
     try {
-      const update = await check();
-      console.log("تم التحقق من التحديثات:", update);
-
-      if (update && update.version) {
-        console.log(`✅ تم العثور على تحديث: v${update.version}`);
-        setLatestVersion(update.version);
-        setReleaseNotes(update.body ?? "لا توجد ملاحظات إصدار.");
-        setUpdateStatus(`تم العثور على تحديث جديد v${update.version}! جارٍ التنزيل...`);
-
-        let downloaded = 0;
-        let contentLength = 0;
-
-        await update.downloadAndInstall((event) => {
-          switch (event.event) {
-            case "Started":
-              contentLength = event.data.contentLength ?? 0;
-              console.log(`⬇️ بدأ التنزيل: ${contentLength} بايت`);
-              setProgress(0);
-              setUpdateStatus("جارٍ تنزيل التحديث...");
-              break;
-            case "Progress":
-              downloaded += event.data.chunkLength;
-              if (contentLength > 0) {
-                const percentage = (downloaded / contentLength) * 100;
-                setProgress(percentage);
-                console.log(`⬇️ جارٍ التنزيل: ${percentage.toFixed(2)}%`);
-              }
-              break;
-            case "Finished":
-              console.log("✅ اكتمل التنزيل، جارٍ تركيب التحديث...");
-              setUpdateStatus("جارٍ تركيب التحديث...");
-              setProgress(null);
-              break;
-          }
-        });
-
-        console.log("🚀 تم تركيب التحديث، جارٍ إعادة التشغيل...");
-        setUpdateStatus("تم تركيب التحديث! جارٍ إعادة التشغيل...");
-        await relaunch();
-
+      const response = await fetch(BASE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ client_code: qrCode }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        setIsVerified(true);
+        setError("");
+  
+        // ✅ حفظ الكود في localStorage
+        localStorage.setItem("qr_code", qrCode);
+  
+        // ✅ الانتقال بعد النجاح
+        setTimeout(() => {
+          router.push("/clients");
+        }, 2000);
       } else {
-        console.log("⚠️ لا توجد تحديثات متاحة.");
-        setUpdateStatus("التطبيق محدث إلى آخر نسخة.");
+        setError(data.message || "الكود غير صحيح");
+        setIsVerified(false);
       }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("❌ حدث خطأ أثناء التحقق من التحديثات:", error.message);
-        setUpdateStatus(`خطأ: ${error.message}`);
-      } else {
-        console.error("❌ حدث خطأ أثناء التحقق من التحديثات:", error);
-        setUpdateStatus("حدث خطأ غير معروف أثناء التحقق من التحديثات.");
-      }
+    } catch (error) {
+      console.error("❌ Error checking code:", error);
+      setError("حدث خطأ في الاتصال بالخادم");
+      setIsVerified(false);
+    } finally {
+      setIsLoading(false);
     }
   };
+  
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1> test مدقق التحديثات</h1>
-      <p><strong>الإصدار الحالي: test</strong> {currentVersion || "جارٍ التحميل..."}</p>
-      {latestVersion && <p><strong>الإصدار الأحدث:</strong> {latestVersion}</p>}
-      {releaseNotes && <p><strong>ملاحظات الإصدار:</strong> {releaseNotes}</p>}
+    <div className="flex flex-col items-center justify-center min-h-screen text-white p-6 rounded-lg shadow-inner">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="text-center mb-6"
+      >
+        <motion.h1
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+          className="text-5xl font-extrabold text-red-500 drop-shadow-lg"
+        >
+          <p className="mb-3">
+            <span className="text-black">مرحبًا بكم في </span>
+            <span className="text-red-500">سراج سوفت</span>
+          </p>
+          <DivOrigami />
+        </motion.h1>
+      </motion.div>
 
-      <button onClick={handleUpdateCheck} style={{ padding: "10px 20px", fontSize: "16px", cursor: "pointer" }}>
-        التحقق من التحديثات
-      </button>
+      <motion.div
+        initial={{ scale: 0.5, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="p-5 bg-white rounded-2xl shadow-2xl mb-4"
+      >
+        <QRCodeCanvas value={qrCode!} size={210} />
+        <p className="text-black mt-2 font-semibold"> {qrCode}</p>
+      </motion.div>
 
-      <p><strong>الحالة: test</strong> {updateStatus}</p>
+      {isVerified ? (
+        <p className="text-green-500 mt-4">تم التحقق من الكود بنجاح! سيتم نقلك الآن...</p>
+      ) : (
+        <div>
+          {!isLoading ? (
+            <>
+               <div className="flex flex-row items-center space-x-4">
 
-      {progress !== null && (
-        <div style={{ marginTop: "10px" }}>
-          <progress value={progress} max="100" style={{ width: "100%" }}></progress>
-          <p>{progress.toFixed(2)}%</p>
+               <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-gradient-to-r from-red-700 to-red-900 hover:from-red-700 hover:to-red-900 text-white px-6 py-3 rounded-lg text-lg font-bold shadow-lg transition-all ml-auto"
+              onClick={handleNext} 
+            >
+التالي            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-gradient-to-r from-red-700 to-red-900 hover:from-red-700 hover:to-red-900 text-white px-6 py-3 rounded-lg text-lg font-bold shadow-lg transition-all"
+              onClick={generateQrCode}
+            >
+              🔄 إعادة إنشاء كود جديد
+            </motion.button>
+
+    
+          </div>
+
+
+            </>
+          ) : (
+            <p className="text-yellow-500 mt-4">جاري التحقق من الكود...</p>
+          )}
         </div>
       )}
 
-      {updateStatus.includes("خطأ") && (
-        <p style={{ color: "red", marginTop: "10px" }}>
-          حدث خطأ أثناء التحقق من التحديثات. يرجى المحاولة مرة أخرى لاحقًا.
-        </p>
-      )}
+      {error && <p className="text-red-500 mt-4">{error}</p>}
     </div>
   );
 }
