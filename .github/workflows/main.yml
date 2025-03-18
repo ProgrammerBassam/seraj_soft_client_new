@@ -1,167 +1,79 @@
-name: Build and Release Tauri App
-
+name: Tauri v2 Release Process
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
 
-permissions:
-  contents: write  # ✅ يمنح صلاحية التعديل على الإصدارات
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CN_APPLICATION: "serajsoft/serajclient"
 
 jobs:
-  build:
-    runs-on: windows-latest
+  draft:
+    runs-on: ubuntu-22.04
 
     steps:
-      - name: 🛎️ Checkout repository
-        uses: actions/checkout@v4
-
-      - name: 🔧 Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - name: create draft release
+        uses: crabnebula-dev/cloud-release@v0
         with:
-          node-version: 18
+          command: release draft ${{ env.CN_APPLICATION }} --framework tauri
+          api-key: ${{ secrets.CN_API_KEY }}
 
-      - name: 🦀 Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+  build:
+    needs: draft
 
-      - name: 📦 Install required Rust targets
-        run: rustup target add x86_64-pc-windows-msvc
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - windows-latest
 
-      - name: 📦 Install dependencies
-        run: npm install
+    runs-on: ${{ matrix.os }}
 
-      - name: 🚀 Install Tauri CLI
-        run: npm install --global @tauri-apps/cli
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install stable toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          cache: true
 
-      - name: 🛠 Debug Environment Variables
-        run: env | sort
+     
 
-      - name: 📝 Generate latest.json
+      - name: build Tauri app for Windows, Linux
+        if: matrix.os != 'macos-latest'
         run: |
-          echo "Generating latest.json..."
-          node scripts/update-latest-json.mjs  # ✅ توليد latest.json
-          dir src-tauri\target\x86_64-pc-windows-msvc\release\bundle\msi  # ✅ عرض محتوى المجلد للتأكد
-          type src-tauri\target\x86_64-pc-windows-msvc\release\bundle\msi\latest.json
-
-      - name: 🛠 Debug Secrets
-        run: |
-          if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then
-            echo "Error: TAURI_SIGNING_PRIVATE_KEY is empty!"
-            exit 1
-          else
-            echo "TAURI_SIGNING_PRIVATE_KEY is set."
-          fi
-        shell: bash
+          npm ci
+          npm exec tauri build
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
 
-      - name: 🔑 Set Tauri Signing Key
-        run: |
-          echo "${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}" > .tauri/myapp.key  # ✅ حفظ المفتاح في ملف
+    
 
-      - name: 🔑 Sign latest.json
-        env:
-            TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        run: |
-            echo "Signing latest.json..."
-            npx tauri signer sign --private-key "$TAURI_SIGNING_PRIVATE_KEY" --password "" "src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/latest.json"
-        shell: bash
-
-      - name: 🔨 Build Tauri App (Windows MSI)
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        run: |
-          echo "Building the Tauri app for Windows MSI..."
-          npx tauri build --target x86_64-pc-windows-msvc --bundles msi
-
-      - name: 📤 Upload artifacts (Windows)
-        uses: actions/upload-artifact@v4
+      - name: upload assets
+        uses: crabnebula-dev/cloud-release@v0
         with:
-          name: tauri-build-windows
-          path: |
-            src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
-            src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/latest.json  # ✅ تأكد من رفع latest.json مع MSI
+          command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+          api-key: ${{ secrets.CN_API_KEY }}
+          path: ./src-tauri
 
-      - name: 🚀 Create GitHub Release
-        uses: softprops/action-gh-release@v2
+  publish:
+    needs: build
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: publish release
+        uses: crabnebula-dev/cloud-release@v0
         with:
-          files: |
-            src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
-            src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/latest.json 
-          tag_name: ${{ github.ref_name }}
-          name: "Release ${{ github.ref_name }}"
-          body: "🚀 New release ${{ github.ref_name }} is available!"
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-
-
-
-
-
-
-
-
-# name: Build and Release Tauri App
-
-# on:
-#   push:
-#     tags:
-#       - "v*"
-
-# permissions:
-#   contents: write  # ✅ يعطي صلاحيات لتحرير الإصدارات
-
-# jobs:
-#   build:
-#     runs-on: windows-latest
-
-#     steps:
-#       - name: 🛎️ Checkout repository
-#         uses: actions/checkout@v4
-
-#       - name: ⚡️ Setup Node.js
-#         uses: actions/setup-node@v4
-#         with:
-#           node-version: '20'
-
-#       - name: 🦀 Install Rust Toolchain
-#         uses: dtolnay/rust-toolchain@stable
-
-#       - name: 📦 Install required Rust targets
-#         run: rustup target add x86_64-pc-windows-msvc
-
-#       - name: 📂 Install Dependencies
-#         run: npm install
-
-#       - name: 🚀 Install Tauri CLI
-#         run: npm install --global @tauri-apps/cli
-
-#       - name: 🛠️ Build Tauri App (MSI)
-#         env:
-#           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-#         run: npm run tauri:build
-
-
-#       - name: 📤 Upload Windows MSI + latest.json
-#         uses: actions/upload-artifact@v4
-#         with:
-#           name: tauri-build-windows
-#           path: |
-#             src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
-#             src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/latest.json
-
-#       - name: 🚀 Create GitHub Release
-#         uses: softprops/action-gh-release@v2
-#         with:
-#           files: |
-#             src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
-#             src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/latest.json
-#           tag_name: ${{ github.ref_name }}
-#           name: "سراج سوفت ${{ github.ref_name }}"
-#           body: "🚀 تحديث جديد متاح الآن ✅"
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          command: release publish ${{ env.CN_APPLICATION }} --framework tauri
+          api-key: ${{ secrets.CN_API_KEY }}
