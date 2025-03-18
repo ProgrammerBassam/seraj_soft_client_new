@@ -47,7 +47,7 @@ jobs:
 
      
 
-      - name: build Tauri app for Windows, Linux
+      - name: build Tauri app for Windows
         if: matrix.os != 'macos-latest'
         run: |
           npm ci
