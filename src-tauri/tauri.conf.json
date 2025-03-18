@@ -5,7 +5,7 @@
     "identifier": "com.seraj.clients",
     "build": {
       "frontendDist": "../out",
-      "devUrl": "http://localhost:3001",
+      "devUrl": "http://localhost:300",
       "beforeDevCommand": "npm run dev",
       "beforeBuildCommand": "npm run build"
     },
