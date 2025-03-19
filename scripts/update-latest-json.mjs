@@ -25,7 +25,7 @@ const latestJson = {
   platforms: {
     "windows-x86_64": {
       signature: "",
-      url: `https://github.com/ProgrammerBassam/seraj_soft_client_new/releases/download/v${version}/seraj-clients_${version}_x64_en-US.msi`
+      url: `http://212.38.94.227:3010/updates/seraj-clients_${version}_x64_en-US.msi`
     }
   }
 };

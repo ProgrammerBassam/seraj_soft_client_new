@@ -1,39 +1,83 @@
-name: Deploy Tauri Updates
+name: Build and Deploy Tauri App
 
 on:
   push:
     tags:
-      - "v*"  # يعمل عند إصدار تاغ جديد مثل v1.0.0
+      - 'v*.*.*'  # يتم تشغيل التحديث عند إنشاء tag جديد مثل v1.0.0
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: 🛎️ Checkout Repository
+        uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 18
+      - name: 🔧 Setup Node.js and Rust
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm install
 
-    - name: Install Rust
-      uses: dtolnay/rust-toolchain@stable
+      - name: 🚀 Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
 
-    - name: Install Tauri dependencies
-      run: npm install
+      - name: 🏗️ Install Tauri CLI
+        run: npm install -g @tauri-apps/cli
 
-    - name: Build Tauri App
-      run: npx tauri build
+      - name: 🔨 Build Tauri App
+        run: npm run tauri build
 
-    - name: Setup SSH Key
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+      - name: 📤 Upload MSI Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: seraj-clients
+          path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
 
-    - name: Deploy to VPS
-      run: |
-        rsync -avzP src-tauri/target/release/bundle/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PATH }}
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: 📥 Download Built MSI
+        uses: actions/download-artifact@v3
+        with:
+          name: seraj-clients
+          path: deploy
+
+      - name: 🛠️ Install Dependencies (if needed)
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: 📤 Upload to VPS
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          VPS_IP: "212.38.94.227"
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
+          # نقل الملف إلى السيرفر
+          scp -o StrictHostKeyChecking=no -P 22 deploy/*.msi root@$VPS_IP:/var/www/html/updates/
+
+          # ضبط الأذونات على الملف
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@$VPS_IP "chmod 644 /var/www/html/updates/*.msi"
+
+      - name: 🔄 Update latest.json on VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@$VPS_IP "echo '{
+            \"version\": \"0.17.0\",
+            \"notes\": \"🚀 إصدار جديد متاح: 0.17.0\",
+            \"pub_date\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
+            \"platforms\": {
+              \"windows-x86_64\": {
+                \"signature\": \"PLACEHOLDER_SIGNATURE\",
+                \"url\": \"http://212.38.94.227:3010/updates/seraj-clients_0.17.0_x64_en-US.msi\"
+              }
+            }
+          }' > /var/www/html/updates/latest.json"
+
+          # ضبط الأذونات على latest.json
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa root@$VPS_IP "chmod 644 /var/www/html/updates/latest.json"
