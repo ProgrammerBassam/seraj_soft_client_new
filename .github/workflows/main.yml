@@ -31,10 +31,11 @@ jobs:
         run: npm run tauri build
 
       - name: 📤 Upload MSI Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: seraj-clients
           path: src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+      
 
   deploy:
     runs-on: ubuntu-latest
@@ -42,7 +43,7 @@ jobs:
 
     steps:
       - name: 📥 Download Built MSI
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: seraj-clients
           path: deploy
