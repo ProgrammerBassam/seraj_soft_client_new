@@ -1,79 +1,39 @@
-name: Tauri v2 Release Process
+name: Deploy Tauri Updates
+
 on:
   push:
-    branches:
-      - main
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  CN_APPLICATION: "serajsoft/serajclient"
+    tags:
+      - "v*"  # يعمل عند إصدار تاغ جديد مثل v1.0.0
 
 jobs:
-  draft:
-    runs-on: ubuntu-22.04
+  deploy:
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - name: create draft release
-        uses: crabnebula-dev/cloud-release@v0
-        with:
-          command: release draft ${{ env.CN_APPLICATION }} --framework tauri
-          api-key: ${{ secrets.CN_API_KEY }}
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-  build:
-    needs: draft
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
 
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - windows-latest
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
 
-    runs-on: ${{ matrix.os }}
+    - name: Install Tauri dependencies
+      run: npm install
 
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: Install stable toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-          cache: true
+    - name: Build Tauri App
+      run: npx tauri build
 
-     
+    - name: Setup SSH Key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-      - name: build Tauri app for Windows
-        if: matrix.os != 'macos-latest'
-        run: |
-          npm ci
-          npm exec tauri build
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-
-    
-
-      - name: upload assets
-        uses: crabnebula-dev/cloud-release@v0
-        with:
-          command: release upload ${{ env.CN_APPLICATION }} --framework tauri
-          api-key: ${{ secrets.CN_API_KEY }}
-          path: ./src-tauri
-
-  publish:
-    needs: build
-
-    runs-on: ubuntu-22.04
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: publish release
-        uses: crabnebula-dev/cloud-release@v0
-        with:
-          command: release publish ${{ env.CN_APPLICATION }} --framework tauri
-          api-key: ${{ secrets.CN_API_KEY }}
+    - name: Deploy to VPS
+      run: |
+        rsync -avzP src-tauri/target/release/bundle/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PATH }}

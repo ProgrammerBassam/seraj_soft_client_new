@@ -97,8 +97,8 @@ export default function Home() {
           className="text-5xl font-extrabold text-red-500 drop-shadow-lg"
         >
           <p className="mb-3">
-            <span className="text-black">مرحبًاjjj  vvvvv بكم في </span>
-            <span className="text-red-500">سراج سوفت</span>
+            <span className="text-black">مرحبًا بكم في </span>
+            <span className="text-red-500">سراج سوففت</span>
           </p>
           <DivOrigami />
         </motion.h1>
