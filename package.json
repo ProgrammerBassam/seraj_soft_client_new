@@ -1,6 +1,6 @@
 {
   "name": "نظام سراج سوفت",
-  "version": "0.17.0",
+  "version": "0.13.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "tauri": "tauri dev",
-    "tauri:build": " npm run build "
+    "tauri:build": "node --no-warnings scripts/update-latest-json.mjs && npm run build "
   },
   "dependencies": {
     "@tauri-apps/api": "^2.3.0",
