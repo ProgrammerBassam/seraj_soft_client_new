@@ -1,0 +1,74 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "seraj-app",
+  "version": "0.1.0",
+  "identifier": "com.seraj-app.app",
+  "build": {
+    "frontendDist": "../../out",
+    "devUrl": "http://localhost:3000",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "نطام سراج سوفت ",
+        "width": 800,
+        "height": 600,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+   
+      "security": {
+  "csp": "default-src 'self' https://your-external-source.com; script-src 'self' 'unsafe-inline' 'unsafe-eval';"
+}
+    
+  },
+  "bundle": {
+        "createUpdaterArtifacts": true,
+
+    "active": true,
+"targets": ["msi", "nsis"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  },
+ "plugins": {
+  "updater": {
+    "active": true,
+    "windows": {
+      "installMode": "passive"
+    
+
+    },
+    "endpoints": [
+			"https://cdn.crabnebula.app/update/serajsoft/serajclient/{{target}}-{{arch}}/{{current_version}}"
+		],
+		"pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEY5OEQxMTY2MDUyRjExOTYKUldTV0VTOEZaaEdOK2EvOHlBM3d1VFR5T2tiWWFEUFdZYkhFaHVJZDBYMWlxLzMzVDVMeTdVcUsK",
+    "dialog": true
+    
+  },
+
+
+
+
+  "process": {    
+    "relaunch": true
+},
+ "permissions": {
+  "updater": {
+    "check": true,
+    "install": true
+  },
+  "all": true
+}
+
+}
+
+}
